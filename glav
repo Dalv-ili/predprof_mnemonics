@@ -1,0 +1,36 @@
+import speech_recognition as sr
+import RPi.GPIO as GPIO
+
+# создаем объект Recognizer
+r = sr.Recognizer()
+
+# устанавливаем режим работы GPIO
+GPIO.setmode(GPIO.BCM)
+
+# определяем пин для кнопки
+button_pin = 18
+
+# устанавливаем пин как вход
+GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+# функция для записи аудио и распознавания речи
+def recognize_speech():
+    # открываем микрофон и записываем аудио
+    with sr.Microphone() as source:
+        print("Говорите...")
+        audio = r.listen(source)
+
+    # отправляем аудио на обработку в голосовой распознаватель
+    try:
+        text = r.recognize_google(audio, language="ru-RU")
+        print("Вы сказали: " + text)
+    except sr.UnknownValueError:
+        print("Голосовой распознаватель не смог распознать вашу речь")
+    except sr.RequestError as e:
+        print("Ошибка при отправке запроса в голосовой распознаватель; {0}".format(e))
+
+# ожидаем нажатия кнопки
+while True:
+    input_state = GPIO.input(button_pin)
+    if input_state == False:
+        recognize_speech()
