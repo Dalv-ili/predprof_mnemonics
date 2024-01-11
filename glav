@@ -1,36 +1,85 @@
 import speech_recognition as sr
 import RPi.GPIO as GPIO
+import time
 
-# создаем объект Recognizer
+BUTTON_PIN = 18
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
 r = sr.Recognizer()
 
-# устанавливаем режим работы GPIO
-GPIO.setmode(GPIO.BCM)
-
-# определяем пин для кнопки
-button_pin = 18
-
-# устанавливаем пин как вход
-GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-# функция для записи аудио и распознавания речи
-def recognize_speech():
-    # открываем микрофон и записываем аудио
+while True:
+    GPIO.wait_for_edge(BUTTON_PIN, GPIO.FALLING)
     with sr.Microphone() as source:
         print("Говорите...")
         audio = r.listen(source)
 
-    # отправляем аудио на обработку в голосовой распознаватель
     try:
         text = r.recognize_google(audio, language="ru-RU")
         print("Вы сказали: " + text)
+        text_array = list(text) # преобразуем текст в массив символов
+        print("Массив символов: " + str(text_array))
     except sr.UnknownValueError:
-        print("Голосовой распознаватель не смог распознать вашу речь")
+        print("Речь не распознана")
     except sr.RequestError as e:
-        print("Ошибка при отправке запроса в голосовой распознаватель; {0}".format(e))
+        print("Ошибка сервиса распознавания речи: {0}".format(e))
 
-# ожидаем нажатия кнопки
-while True:
-    input_state = GPIO.input(button_pin)
-    if input_state == False:
-        recognize_speech()
+# настройка пинов GPIO для каждого сервопривода
+servo1Pin = 18
+servo2Pin = 23
+servo3Pin = 24
+servo4Pin = 25
+servo5Pin = 12
+servo6Pin = 16
+
+# инициализация библиотеки GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(servo1Pin, GPIO.OUT)
+GPIO.setup(servo2Pin, GPIO.OUT)
+GPIO.setup(servo3Pin, GPIO.OUT)
+GPIO.setup(servo4Pin, GPIO.OUT)
+GPIO.setup(servo5Pin, GPIO.OUT)
+GPIO.setup(servo6Pin, GPIO.OUT)
+
+# создание объектов для каждого сервопривода
+servo1 = GPIO.PWM(servo1Pin, 50)
+servo2 = GPIO.PWM(servo2Pin, 50)
+servo3 = GPIO.PWM(servo3Pin, 50)
+servo4 = GPIO.PWM(servo4Pin, 50)
+servo5 = GPIO.PWM(servo5Pin, 50)
+servo6 = GPIO.PWM(servo6Pin, 50)
+
+# запуск сервоприводов
+servo1.start(0)
+servo2.start(0)
+servo3.start(0)
+servo4.start(0)
+servo5.start(0)
+servo6.start(0)
+
+# метод для управления всеми 6 сервоприводами (ТАКИХ МЕТОДОВ 64 ДЛЯ КАЖДОЙ БУКВЫ)
+def control_servos(servo1_angle, servo2_angle, servo3_angle, servo4_angle, servo5_angle, servo6_angle):
+    # установка углов поворота для каждого сервопривода
+    servo1.ChangeDutyCycle(2 + (servo1_angle / 18))
+    servo2.ChangeDutyCycle(2 + (servo2_angle / 18))
+    servo3.ChangeDutyCycle(2 + (servo3_angle / 18))
+    servo4.ChangeDutyCycle(2 + (servo4_angle / 18))
+    servo5.ChangeDutyCycle(2 + (servo5_angle / 18))
+    servo6.ChangeDutyCycle(2 + (servo6_angle / 18))
+
+    # задержка для стабилизации сервоприводов
+    time.sleep(0.5)
+
+# вызов метода для управления сервоприводами
+control_servos(90, 90, 90, 90, 90, 90)
+
+# остановка сервоприводов
+servo1.stop()
+servo2.stop()
+servo3.stop()
+servo4.stop()
+servo5.stop()
+servo6.stop()
+
+# освобождение пинов GPIO
+GPIO.cleanup()
