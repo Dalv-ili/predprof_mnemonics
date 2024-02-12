@@ -61,18 +61,40 @@ for part in text_parts:
         xMotor.setSpeed(100)
         yMotor.setSpeed(100)
         if part[i] == '1':
-            # Перемещение на 100 шагов вправо и на 50 шагов вверх
-            xMotor.step(100)
-            yMotor.step(-50)
+            # Перемещение на 600 шагов вправо
+            xMotor.step(600)
+            xMotor.step(-600)
+	    time.sleep(3)
         elif part[i] == '2':
-            # Перемещение на 50 шагов вправо и на 50 шагов вверх
-            xMotor.step(50)
+            # Перемещение на 1200 шагов вправо, на 50 шагов вниз, на 1200 шагов влево, на 1200 шагов вправо
+            xMotor.step(1200)
+            yMotor.step(50)
+            xMotor.step(-1200)
+            xMotor.step(1200)
+       	    xMotor.step(-1200)
             yMotor.step(-50)
+            time.sleep(9)
         elif part[i] == '3':
             # Перемещение на 50 шагов вправо и на 100 шагов вверх
-            xMotor.step(50)
-            yMotor.step(-100)
-        
+            xMotor.step(600)
+            xMotor.step(-600)
+            yMotor.step(50)
+            xMotor.step(500)
+            xMotor.step(-500)
+            yMotor.step(50)
+            xMotor.step(500)
+            xMotor.step(-500)
+            yMotor.step(50)
+            xMotor.step(500)
+            xMotor.step(-500)
+            yMotor.step(50)
+            xMotor.step(500)
+            xMotor.step(-500)
+            yMotor.step(50)
+            xMotor.step(500)
+            xMotor.step(-500)
+	    yMotor.step(-250)
+	    time.sleep(12)
         # Пауза для задержки между символами
         time.sleep(0.5)
 
